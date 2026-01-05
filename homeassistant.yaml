@@ -1,0 +1,345 @@
+# Home Assistant MQTT Configuration for Media Bridge
+# Add this to your configuration.yaml or a split configuration file
+#
+# All entities are grouped under the "Media Bridge" device
+
+mqtt:
+  # ============================================================================
+  # TV Power Sensor
+  # ============================================================================
+  binary_sensor:
+    - name: "TV Power"
+      unique_id: "media_bridge_tv_power"
+      state_topic: "media/living_room/tv/on"
+      payload_on: "true"
+      payload_off: "false"
+      device_class: power
+      availability_topic: "media/living_room/availability"
+      payload_available: "online"
+      payload_not_available: "offline"
+      device:
+        identifiers: ["media_bridge_living_room"]
+        name: "Media Bridge"
+        manufacturer: "DIY"
+        model: "RPi Media Bridge"
+
+  # ============================================================================
+  # Source State Sensors
+  # ============================================================================
+  sensor:
+    - name: "Spotify State"
+      unique_id: "media_bridge_spotify_state"
+      state_topic: "media/living_room/source/spotify/state"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:spotify
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Spotify Level"
+      unique_id: "media_bridge_spotify_level"
+      state_topic: "media/living_room/source/spotify/level"
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-high
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "AirPlay State"
+      unique_id: "media_bridge_airplay_state"
+      state_topic: "media/living_room/source/airplay/state"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:apple
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "AirPlay Level"
+      unique_id: "media_bridge_airplay_level"
+      state_topic: "media/living_room/source/airplay/level"
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-high
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV State"
+      unique_id: "media_bridge_tv_audio_state"
+      state_topic: "media/living_room/source/tv/state"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:television-speaker
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Level"
+      unique_id: "media_bridge_tv_audio_level"
+      state_topic: "media/living_room/source/tv/level"
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-high
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Level dB"
+      unique_id: "media_bridge_tv_audio_level_db"
+      state_topic: "media/living_room/source/tv/level_db"
+      unit_of_measurement: "dB"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:waveform
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Active Sources"
+      unique_id: "media_bridge_active_sources"
+      state_topic: "media/living_room/sources/active"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:speaker-multiple
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+  # ============================================================================
+  # Volume Controls (Number entities)
+  # ============================================================================
+  number:
+    # Master volume - controls overall output level
+    - name: "Master Volume"
+      unique_id: "media_bridge_master_volume"
+      state_topic: "media/living_room/master/volume"
+      command_topic: "media/living_room/master/set_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-high
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    # Per-source volumes
+    - name: "Spotify Volume"
+      unique_id: "media_bridge_spotify_volume"
+      state_topic: "media/living_room/source/spotify/volume"
+      command_topic: "media/living_room/source/spotify/set_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:spotify
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "AirPlay Volume"
+      unique_id: "media_bridge_airplay_volume"
+      state_topic: "media/living_room/source/airplay/volume"
+      command_topic: "media/living_room/source/airplay/set_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:apple
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Volume"
+      unique_id: "media_bridge_tv_volume"
+      state_topic: "media/living_room/source/tv/volume"
+      command_topic: "media/living_room/source/tv/set_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      optimistic: false
+      availability_topic: "media/living_room/availability"
+      icon: mdi:television-speaker
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    # Default volumes (what sources reset to when they stop)
+    - name: "Spotify Default Volume"
+      unique_id: "media_bridge_spotify_default_volume"
+      state_topic: "media/living_room/source/spotify/default_volume"
+      command_topic: "media/living_room/source/spotify/set_default_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:spotify
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "AirPlay Default Volume"
+      unique_id: "media_bridge_airplay_default_volume"
+      state_topic: "media/living_room/source/airplay/default_volume"
+      command_topic: "media/living_room/source/airplay/set_default_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:apple
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Default Volume"
+      unique_id: "media_bridge_tv_default_volume"
+      state_topic: "media/living_room/source/tv/default_volume"
+      command_topic: "media/living_room/source/tv/set_default_volume"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:television-speaker
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    # Volume slew rate - how fast volume can change
+    - name: "Volume Slew Rate"
+      unique_id: "media_bridge_slew_rate"
+      state_topic: "media/living_room/master/slew_rate"
+      command_topic: "media/living_room/master/set_slew_rate"
+      min: 0
+      max: 100
+      step: 5
+      unit_of_measurement: "%/s"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:speedometer
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Silence Threshold"
+      unique_id: "media_bridge_tv_silence_threshold"
+      state_topic: "media/living_room/source/tv/silence_threshold"
+      command_topic: "media/living_room/source/tv/set_silence_threshold"
+      min: -80
+      max: -20
+      step: 1
+      unit_of_measurement: "dB"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-low
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Silence Duration"
+      unique_id: "media_bridge_tv_silence_duration"
+      state_topic: "media/living_room/source/tv/silence_duration"
+      command_topic: "media/living_room/source/tv/set_silence_duration"
+      min: 0.5
+      max: 30
+      step: 0.5
+      unit_of_measurement: "s"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:timer-outline
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+  # ============================================================================
+  # Mute Switches & TV Power Control
+  # ============================================================================
+  switch:
+    - name: "TV Power"
+      unique_id: "media_bridge_tv_switch"
+      state_topic: "media/living_room/tv/on"
+      command_topic: "media/living_room/tv/power_on"
+      payload_on: ""
+      payload_off: ""
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:television
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Spotify Mute"
+      unique_id: "media_bridge_spotify_mute"
+      state_topic: "media/living_room/source/spotify/muted"
+      command_topic: "media/living_room/source/spotify/set_mute"
+      payload_on: "true"
+      payload_off: "false"
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-off
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "AirPlay Mute"
+      unique_id: "media_bridge_airplay_mute"
+      state_topic: "media/living_room/source/airplay/muted"
+      command_topic: "media/living_room/source/airplay/set_mute"
+      payload_on: "true"
+      payload_off: "false"
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-off
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Mute"
+      unique_id: "media_bridge_tv_mute"
+      state_topic: "media/living_room/source/tv/muted"
+      command_topic: "media/living_room/source/tv/set_mute"
+      payload_on: "true"
+      payload_off: "false"
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-off
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "TV Auto-Mute"
+      unique_id: "media_bridge_tv_auto_mute"
+      state_topic: "media/living_room/source/tv/auto_mute"
+      command_topic: "media/living_room/source/tv/set_auto_mute"
+      payload_on: "true"
+      payload_off: "false"
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:volume-variant-off
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Reset Volume On Stop"
+      unique_id: "media_bridge_reset_on_stop"
+      state_topic: "media/living_room/master/reset_on_stop"
+      command_topic: "media/living_room/master/set_reset_on_stop"
+      payload_on: "true"
+      payload_off: "false"
+      state_on: "true"
+      state_off: "false"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:restore
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+  # ============================================================================
+  # Playback Control Buttons (Spotify only - has MPRIS control)
+  # ============================================================================
+  button:
+    - name: "Spotify Play"
+      unique_id: "media_bridge_spotify_play"
+      command_topic: "media/living_room/source/spotify/play"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:play
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Spotify Pause"
+      unique_id: "media_bridge_spotify_pause"
+      command_topic: "media/living_room/source/spotify/pause"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:pause
+      device:
+        identifiers: ["media_bridge_living_room"]
+
+    - name: "Spotify Stop"
+      unique_id: "media_bridge_spotify_stop"
+      command_topic: "media/living_room/source/spotify/stop"
+      availability_topic: "media/living_room/availability"
+      icon: mdi:stop
+      device:
+        identifiers: ["media_bridge_living_room"]

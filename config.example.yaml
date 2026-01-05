@@ -1,0 +1,87 @@
+# Media Bridge Configuration
+# Copy this file to /etc/media-bridge/config.yaml or ~/.config/media-bridge/config.yaml
+
+# MQTT Configuration
+mqtt:
+  # Home Assistant Mosquitto broker
+  host: "homeassistant.local"
+  port: 1883
+  
+  # Credentials (optional, can also use MQTT_USERNAME/MQTT_PASSWORD env vars)
+  username: "media-bridge"
+  password: "your-password-here"
+  
+  # Client identification
+  client_id: "media-bridge-living-room"
+  
+  # Topic prefix for all messages
+  # State topics: {prefix}/source/{name}/volume, {prefix}/source/{name}/state, etc.
+  # Command topics: {prefix}/source/{name}/set_volume, etc.
+  topic_prefix: "media/living_room"
+  
+  # Connection settings
+  keepalive: 60
+  reconnect_delay: 5.0
+
+# HDMI-CEC Configuration (TV power control)
+cec:
+  # Enable/disable CEC
+  enabled: true
+  
+  # CEC device path (default for Raspberry Pi)
+  # Use /dev/cec1 if HDMI port 2
+  device: "/dev/cec1"
+  
+  # How often to poll TV power state (seconds)
+  poll_interval: 5.0
+  
+  # PulseAudio sink for volume control via TV remote (optional, auto-detects Scarlett)
+  pulse_sink: null
+  
+  # Volume step for TV remote volume up/down (%)
+  volume_step: 5
+
+# Audio Sources Configuration
+audio:
+  # Enable/disable audio source monitoring
+  enabled: true
+  
+  # How often to poll source state (seconds)
+  poll_interval: 1.0
+  
+  # TV audio S/PDIF capture device (ALSA device name)
+  # Find with: arecord -l | grep -i spdif
+  tv_alsa_device: "hw:CARD=ClearClick,DEV=0"
+  
+  # Output sink for TV audio (optional, auto-detects Scarlett)
+  pulse_sink: null
+  
+  # Volume settings
+  volume:
+    # Master volume (0-100) - overall output level
+    master: 50
+    
+    # Default volumes per source (0-100)
+    # Sources reset to these levels when they stop playing
+    default_spotify: 15
+    default_airplay: 15
+    default_tv: 100 # we dont control the tv volume yet.
+    
+    # Whether to reset volume when source stops playing
+    reset_on_stop: true
+    
+    # Maximum volume slew rate (%/second)
+    # Prevents sudden loud blasts by ramping volume gradually
+    # 0 = instant (no limit), 25 = takes 4 seconds to go 0->100%
+    slew_rate: 0
+
+# Logging Configuration
+log:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Optional log file (in addition to stdout/journal)
+  file: null

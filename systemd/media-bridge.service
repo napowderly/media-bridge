@@ -1,0 +1,44 @@
+[Unit]
+Description=RPI Living Room Media Bridge
+Documentation=https://github.com/yourusername/media-bridge
+After=network-online.target mosquitto.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=atopile
+Group=atopile
+
+# Required for CEC access
+SupplementaryGroups=video
+
+# Working directory
+WorkingDirectory=/home/atopile/media-bridge
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/etc/media-bridge/env
+
+# Main command
+ExecStart=/home/atopile/media-bridge/.venv/bin/media-bridge --config /etc/media-bridge/config.yaml
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=media-bridge
+
+# Security hardening (relaxed for compatibility)
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Timeouts
+TimeoutStartSec=30
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
+
