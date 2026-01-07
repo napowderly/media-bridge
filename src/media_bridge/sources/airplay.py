@@ -109,20 +109,26 @@ class AirPlaySource(AudioSource, PulseAudioMixin):
         logger.info(f"Starting metadata reader for {self._metadata_pipe}")
         
         buffer = ""
+        consecutive_empty_reads = 0
         
         while self._running:
             try:
                 # Check if pipe exists
                 if not os.path.exists(self._metadata_pipe):
+                    logger.warning(f"Metadata pipe does not exist: {self._metadata_pipe}")
                     time.sleep(1)
                     continue
                 
+                logger.debug(f"Opening metadata pipe: {self._metadata_pipe}")
+                
                 # Open pipe (non-blocking)
                 fd = os.open(self._metadata_pipe, os.O_RDONLY | os.O_NONBLOCK)
+                logger.debug(f"Opened fd={fd}, wrapping in file object...")
                 pipe = os.fdopen(fd, 'r', encoding='utf-8', errors='replace')
                 
-                logger.info("Metadata pipe opened")
+                logger.info(f"Metadata pipe opened successfully (fd={fd})")
                 buffer = ""
+                consecutive_empty_reads = 0
                 
                 while self._running:
                     # Use select to avoid blocking forever
@@ -131,11 +137,27 @@ class AirPlaySource(AudioSource, PulseAudioMixin):
                         continue
                     
                     # Read available data
-                    chunk = pipe.read(4096)
-                    if not chunk:
-                        # Pipe closed
-                        break
+                    try:
+                        chunk = pipe.read(4096)
+                    except IOError as e:
+                        # Handle EAGAIN/EWOULDBLOCK - no data available yet
+                        import errno
+                        if e.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+                            continue
+                        raise
                     
+                    if not chunk:
+                        # Empty read - could be EOF or just no data
+                        # With non-blocking FIFO, this can happen transiently
+                        # Only consider pipe closed after many consecutive empty reads
+                        consecutive_empty_reads += 1
+                        if consecutive_empty_reads > 10:
+                            logger.debug("Metadata pipe appears closed (repeated empty reads)")
+                            break
+                        continue
+                    
+                    # Got data - reset counter
+                    consecutive_empty_reads = 0
                     buffer += chunk
                     
                     # Extract complete <item>...</item> elements
@@ -164,12 +186,12 @@ class AirPlaySource(AudioSource, PulseAudioMixin):
                 
             except OSError as e:
                 if e.errno == 6:  # No such device or address (pipe closed)
-                    logger.debug("Metadata pipe closed, will retry")
+                    logger.info("Metadata pipe closed, will retry")
                 else:
-                    logger.debug(f"Metadata pipe error: {e}")
+                    logger.warning(f"Metadata pipe error (errno={e.errno}): {e}")
                 time.sleep(1)
             except Exception as e:
-                logger.debug(f"Metadata reader error: {e}")
+                logger.warning(f"Metadata reader error: {type(e).__name__}: {e}")
                 time.sleep(1)
         
         logger.info("Metadata reader stopped")
